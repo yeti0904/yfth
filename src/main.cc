@@ -4,6 +4,8 @@
 #include "fs.hh"
 #include "interpreter.hh"
 #include "language.hh"
+#include "builtin.hh"
+#include "constants.hh"
 
 int main(int argc, char** argv) {
 	std::vector <std::string> args;
@@ -14,10 +16,14 @@ int main(int argc, char** argv) {
 	// settings
 	bool        lexerDebug = false;
 	bool        stackDebug = false;
-	std::string sourceFile;
+	std::string sourceFile = "";
 
-	for (size_t i = 0; i<args.size(); ++i) {
+	for (size_t i = 1; i<args.size(); ++i) {
 		if (args[i][0] == '-') {
+			if (Util::ValidateArgument(args[i], "--version", "-v")) {
+				printf("%s %s\n", APP_TITLE, APP_VERSION);
+				return 0;
+			}
 			if (Util::ValidateArgument(args[i], "--lexer-debug", "-ld")) {
 				lexerDebug = !lexerDebug;
 				printf("Note: lexer debug is %s\n", lexerDebug? "on": "off");
@@ -29,6 +35,22 @@ int main(int argc, char** argv) {
 		}
 		else {
 			sourceFile = args[i];
+		}
+	}
+
+	// init language
+	Forth::Language_Components components;
+	BuiltIn::Init(components);
+
+	if (sourceFile == "") {
+		printf("%s %s\nshell (very very broken bc standard input functions suck)\n", APP_TITLE, APP_VERSION);
+		std::string input;
+		while (true) {
+			printf("> ");
+			std::cin >> input;
+			std::vector <Lexer::Token> tokens = Lexer::Lex(input);
+			bool ok = Interpret(tokens, components);
+			puts(ok? "  ok" : "  FAIL");
 		}
 	}
 
@@ -49,17 +71,17 @@ int main(int argc, char** argv) {
 	}
 
 	// interpret
-	Forth::Language_Components components;
 	bool ok = Interpret(tokens, components); // line 53
 	if (!ok) {
-		printf("FAIL");
+		puts("  FAIL");
 		return 1;
 	}
 	if (stackDebug) {
 		for (size_t i = 0; i<components.stack.size(); ++i) {
 			printf(" %05d | %d\n", (int) i, components.stack[i]);
-			return 0;
 		}
+		printf("Total stack size: %d\n", (int) components.stack.size());
+		return 0;
 	}
 
 	return 0;

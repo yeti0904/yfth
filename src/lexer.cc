@@ -9,6 +9,11 @@ void AddToken(std::string& reading, std::vector <Lexer::Token>& ret) {
 	}
 	else {
 		add.type    = Lexer::TokenType::Word;
+		for (size_t i = 0; i<reading.length(); ++i) {
+			if ((reading[i] >= 'A') && (reading[i] <= 'Z')) {
+				reading[i] = tolower(reading[i]);
+			}
+		}
 		add.content = reading;
 	}
 	ret.push_back(add);
