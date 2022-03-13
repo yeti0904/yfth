@@ -30,7 +30,7 @@ bool Interpret(std::vector <Lexer::Token> tokens, Forth::Language_Components& co
 					break;
 				}
 				if (tokens[i].content == "do") {
-					if (components.stack.size() < 1) {
+					if (components.stack.size() < 2) {
 						printf("Stack underflow");
 						return false;
 					}
@@ -55,6 +55,35 @@ bool Interpret(std::vector <Lexer::Token> tokens, Forth::Language_Components& co
 						if (!Interpret(loopTokens, components))
 							return false;
 					}
+					break;
+				}
+				if (tokens[i].content == "if") {
+					if (components.stack.size() < 1) {
+						printf("Stack underflow");
+						return false;
+					}
+					
+					size_t num = 1;
+					std::vector <Lexer::Token> loopTokens;
+					bool   elseExists;
+					size_t whereElse;
+					for (++i; i<tokens.size(); ++i) {
+						if (tokens[i].type == Lexer::TokenType::Word) {
+							if (tokens[i].content == "if")   ++ num;
+							if (tokens[i].content == "then") -- num;
+						}
+						if (num == 0)
+							break;
+						else
+							loopTokens.push_back(tokens[i]);
+					}
+					if (components.stack[components.stack.size() - 1] == 0) {
+						components.stack.pop_back();
+						break;
+					}
+					components.stack.pop_back();
+					if (!Interpret(loopTokens, components))
+						return false;
 					break;
 				}
 				if (components.dictionary[tokens[i].content] != NULL) {

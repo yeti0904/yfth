@@ -14,4 +14,6 @@ namespace BuiltIn {
 	bool Drop(Forth::Language_Components& components);     // drop
 	bool Cr(Forth::Language_Components& components);       // CR
 	bool I(Forth::Language_Components& components);        // i
+	bool Invert(Forth::Language_Components& components);   // invert
+	bool Equal(Forth::Language_Components& components);    // =
 };
