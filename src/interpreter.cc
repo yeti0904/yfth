@@ -65,8 +65,8 @@ bool Interpret(std::vector <Lexer::Token> tokens, Forth::Language_Components& co
 					
 					size_t num = 1;
 					std::vector <Lexer::Token> loopTokens;
-					bool   elseExists;
-					size_t whereElse;
+					//bool   elseExists;
+					//size_t whereElse;
 					for (++i; i<tokens.size(); ++i) {
 						if (tokens[i].type == Lexer::TokenType::Word) {
 							if (tokens[i].content == "if")   ++ num;
